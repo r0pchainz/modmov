@@ -1,0 +1,1 @@
+sudo apt-get install apt-transport-tor apt-transport-https virtualbox qemu qemu-system virt-manager torchat python3-pip python-pip 
