@@ -1,0 +1,5 @@
+grep "torrentz2.eu" *.html > file1
+replace "https://torrentz2.eu/" "" -- file3
+grep -oP '"\K[^"\047]+(?=["\047])'  file3 > file4
+grep -o -w -E '^[[:alnum:]]{40}' file4 > file6
+
