@@ -1,3 +1,7 @@
 #sudo dpkg --add-architecture i386 
 sudo apt-get update && sudo apt-get dist-upgrade && sudo apt-get upgrade
 sudo apt-get install firejail apparmor ricochet-im onionshare apt-transport-tor apt-transport-https wine32 wine deluge qbittorrent qemu qemu-system virt-manager virtualbox terminator xfburn firefox firefox-esr konqorer gnunet tor torchat i2p 
+
+# ansible
+# xfburn keepassxc clamav rkhunter gufw
+# gnucash scribus gimp gnotime kexi leafpad pluma bluefish guake
