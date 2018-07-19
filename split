@@ -1,2 +1,9 @@
 split -b 100M Linux\ Security.mp4 ls.
 cat ls.?? > Linux_security.mp4
+
+
+tar xjf file.tar.bz2
+tar xzvf file.tar.gz
+sudo ./configure && make && sudo make install
+
+python install -r requirements.txt
