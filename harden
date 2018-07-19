@@ -1,0 +1,4 @@
+#Debian OS only
+cd /lib/modules/`uname -r`/kernel/drivers/usb/storage/ 
+mv usb-storage.ko usb-storage.ko.blacklist
+echo "alias usb-storage off" >> /etc/modprobe.d/blacklist-usbstorage.conf
