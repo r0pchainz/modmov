@@ -2,6 +2,9 @@
 sudo apt-get update &&
 sudo apt-get install pdftk ffmpeg -y
 
+#convert all filenames to lowercase
+#find my_root_dir -depth -exec rename 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;
+
 #parse to mp4
 find . -iname "*.mov" -exec bash -c 'mv "$0" "${0%\.mov}.mp4"' {} \;
 find . -iname "*.avi" -exec bash -c 'mv "$0" "${0%\.avi}.mp4"' {} \;
@@ -16,7 +19,8 @@ find . -iname "*.odt" -exec bash -c 'mv "$0" "${0%\.odt}.pdf"' {} \;
 find . -iname "*.txt" -exec bash -c 'mv "$0" "${0%\.txt}.pdf"' {} \;
 find . -iname "*.docx" -exec bash -c 'mv "$0" "${0%\.docx}.pdf"' {} \;
 find . -iname "*.doc" -exec bash -c 'mv "$0" "${0%\.doc}.pdf"' {} \;
-
+find . -iname "*.djvu" -exec bash -c 'mv "$0" "${0%\.djvu}.pdf"' {} \;
+find . -iname "*.epub" -exec bash -c 'mv "$0" "${0%\.epub}.pdf"' {} \;
 
 #rename file to sha1
 for fname in *.mp4; do (mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').mp4; ) done
