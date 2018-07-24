@@ -1,9 +1,11 @@
-#update and install pdftk
+#update and install pdftk ffmpeg
 sudo apt-get update &&
 sudo apt-get install pdftk ffmpeg -y
 
 #convert all filenames to lowercase
-#find my_root_dir -depth -exec rename 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;
+find . -name '*.*' -exec sh -c '
+  a=$(echo "$0" | sed -r "s/([^.]*)\$/\L\1/");
+  [ "$a" != "$0" ] && mv "$0" "$a" ' {} \;
 
 #parse to mp4
 find . -iname "*.mov" -exec bash -c 'mv "$0" "${0%\.mov}.mp4"' {} \;
@@ -21,8 +23,14 @@ find . -iname "*.docx" -exec bash -c 'mv "$0" "${0%\.docx}.pdf"' {} \;
 find . -iname "*.doc" -exec bash -c 'mv "$0" "${0%\.doc}.pdf"' {} \;
 find . -iname "*.djvu" -exec bash -c 'mv "$0" "${0%\.djvu}.pdf"' {} \;
 find . -iname "*.epub" -exec bash -c 'mv "$0" "${0%\.epub}.pdf"' {} \;
+find . -iname "*.pdb" -exec bash -c 'mv "$0" "${0%\.pdb}.pdf"' {} \;
+find . -iname "*.chm" -exec bash -c 'mv "$0" "${0%\.chm}.pdf"' {} \;
 
-ffmpeg -y -i "test.mkv" -c copy -map_metadata -1 -metadata title="My Title" -metadata creation_time=2016-09-20T21:30:00 -map_chapters -1 "test.mkv"
+# strip meta
+for cat in *.mp4;
+do
+ffmpeg -y -i $cat -c copy -map_metadata -1 -metadata title="My Title" -metadata creation_time=2016-09-20T21:30:00 -map_chapters -1 $cat
+done
 
 #rename file to sha1
 for fname in *.mp4; do (mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').mp4; ) done
@@ -32,24 +40,17 @@ for fname in *.pdf; do (mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').p
 
 for fuckit in *.pdf; 
 do 
-    cat=${fuckit::-4}
-    mkdir $cat
-    cp $fuckit $cat
-    cd $cat
-    pdftk $fuckit burst 
-    #convert single pages pdf into jpg 
-    for lovewiththecoco in *.pdf; 
-    do
-        cat=${lovewiththecoco::-4}
-        cat="$cat.jpg"
-        #removes exif max quality 300 dpi
-        convert -strip -density 300 $lovewiththecoco  -quality 100 $cat
-        rm $lovewiththecoco
-    done
-    rm $fuckit
-    cd ../
-    rm $fuckit 
+    pdftk $fuckit burst
+    rm  $fuckit 
 done
+for lovewiththecoco in *.pdf; 
+do
+    cat=${lovewiththecoco%.*}
+    cat="$cat.jpg"
+    convert -density 300 -strip $lovewiththecoco  -quality 100 $cat
+    rm $lovewiththecoco
+done
+echo "process complete"
 
 for file in *.mp3; 
 do 
