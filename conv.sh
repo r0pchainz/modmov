@@ -25,12 +25,7 @@ find . -iname "*.djvu" -exec bash -c 'mv "$0" "${0%\.djvu}.pdf"' {} \;
 find . -iname "*.epub" -exec bash -c 'mv "$0" "${0%\.epub}.pdf"' {} \;
 find . -iname "*.pdb" -exec bash -c 'mv "$0" "${0%\.pdb}.pdf"' {} \;
 find . -iname "*.chm" -exec bash -c 'mv "$0" "${0%\.chm}.pdf"' {} \;
-
-# strip meta
-for cat in *.mp4;
-do
-ffmpeg -y -i $cat -c copy -map_metadata -1 -metadata title="My Title" -metadata creation_time=2016-09-20T21:30:00 -map_chapters -1 $cat
-done
+find . -iname "*.srt" -exec bash -c 'mv "$0" "${0%\.srt}.pdf"' {} \;
 
 #rename file to sha1
 for fname in *.mp4; do (mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').mp4; ) done
