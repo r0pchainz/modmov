@@ -28,7 +28,11 @@ find . -iname "*.chm" -exec bash -c 'mv "$0" "${0%\.chm}.pdf"' {} \;
 find . -iname "*.srt" -exec bash -c 'mv "$0" "${0%\.srt}.pdf"' {} \;
 
 #rename file to sha1
-for fname in *.mp4; do (mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').mp4; ) done
+for fname in *.mp4;
+do 
+(mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').mp4; )
+ffmpeg -i $fname -vcodec libx264 -crf 24 $fname
+done
 
 #rename file to sha1 in case of long name/ bad chars
 for fname in *.pdf; do (mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').pdf; ) done
