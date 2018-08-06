@@ -26,7 +26,8 @@ find . -iname "*.epub" -exec bash -c 'mv "$0" "${0%\.epub}.pdf"' {} \;
 find . -iname "*.pdb" -exec bash -c 'mv "$0" "${0%\.pdb}.pdf"' {} \;
 find . -iname "*.chm" -exec bash -c 'mv "$0" "${0%\.chm}.pdf"' {} \;
 find . -iname "*.srt" -exec bash -c 'mv "$0" "${0%\.srt}.pdf"' {} \;
-
+vtt
+azw3
 #rename file to sha1
 for fname in *.mp4;
 do 
