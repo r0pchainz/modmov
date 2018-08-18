@@ -6,10 +6,518 @@ sudo dd if=/home/(redacted)/Desktop/lol.iso of=/dev/sda bs=4M
 &&
 sync &&
 sudo eject /dev/sdc
+sudo apt-get install fail2ban acct tcpd
+sudo lynis -c
+echo "SELINUX=enforcing" >> /etc/selinux/config
+#apt-get --purge remove nfs-kernel-server nfs-common portmap
+
+echo 0 > /etc/security/limits.conf
+echo "fs.suid_dumpable = 0 
+# Avoid a smurf attack
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+
+# Turn on protection for bad icmp error messages
+net.ipv4.icmp_ignore_bogus_error_responses = 1
+
+# Turn on syncookies for SYN flood attack protection
+net.ipv4.tcp_syncookies = 1
+
+# Turn on and log spoofed, source routed, and redirect packets
+net.ipv4.conf.all.log_martians = 1
+net.ipv4.conf.default.log_martians = 1
+
+# No source routed packets here
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv4.conf.default.accept_source_route = 0
+
+# Turn on reverse path filtering
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+
+# Make sure no one can alter the routing tables
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.all.secure_redirects = 0
+net.ipv4.conf.default.secure_redirects = 0
+
+# Don't act as a router
+net.ipv4.ip_forward = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+
+# Turn on execshield for reducing worm or other automated remote attacks 
+kernel.exec-shield = 1
+kernel.randomize_va_space = 1
+
+# Tune IPv6 
+net.ipv6.conf.default.router_solicitations = 0
+net.ipv6.conf.default.accept_ra_rtr_pref = 0
+net.ipv6.conf.default.accept_ra_pinfo = 0
+net.ipv6.conf.default.accept_ra_defrtr = 0
+net.ipv6.conf.default.autoconf = 0
+net.ipv6.conf.default.dad_transmits = 0
+net.ipv6.conf.default.max_addresses = 1
+
+# Increase system file descriptor limit    
+fs.file-max = 65535
+
+# Allow for more PIDs (Prevention of fork() failure error message) 
+kernel.pid_max = 65536
+
+# Increase system IP port limits
+net.ipv4.ip_local_port_range = 2000 65000
+
+# Tuning Linux network stack to increase TCP buffer size. Set the max OS send buffer size (wmem) and receive buffer size (rmem) to 12 MB for queues on all protocols.
+net.core.rmem_max = 8388608
+net.core.wmem_max = 8388608
+
+# set minimum size, initial size and max size
+net.ipv4.tcp_rmem = 10240 87380 12582912
+net.ipv4.tcp_wmem = 10240 87380 12582912 
+
+# Value to set for queue on the INPUT side when incoming packets are faster then the kernel process on them. 
+net.core.netdev_max_backlog = 5000
+
+# For increasing transfer window, enable window scaling
+net.ipv4.tcp_window_scaling = 1
+
+kernel.exec-shield = 1 
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv6.conf.all.accept_redirects = 0
+net.ipv4.ip_forward =0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.icmp_ignore_bogus_error_responses =1
+net.ipv4.conf.default.accept_redirects =0
+net.ipv4.conf.all.send_redirects =0
+net.ipv4.conf.default.send_redirects =0
+net.ipv4.conf.default.accept_redirects =0
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv6.conf.all.accept_source_route = 0
+net.ipv4.conf.all.log_martians = 1
+kernel.randomize_va_space = 2" >> etc/sysctl.conf
+echo "auth required pam_env.so
+
+auth required pam_faillock.so preauth audit silent deny=5 unlock_time=604800
+
+auth [success=1 default=bad] pam_unix.so
+
+auth [default=die] pam_faillock.so authfail audit deny=5 unlock_time=604800
+
+auth sufficient pam_faillock.so authsucc audit deny=5 unlock_time=604800
+
+auth required pam_deny.so" >> /etc/pam.d/system-auth
+
+echo "auth required pam_env.so
+
+auth required pam_faillock.so preauth audit silent deny=3 unlock_time=604800
+
+auth [success=1 default=bad] pam_unix.so
+
+auth [default=die] pam_faillock.so authfail audit deny=3 unlock_time=604800
+
+auth sufficient pam_faillock.so authsucc audit deny=3 unlock_time=604800
+
+auth required pam_deny.so" >>/etc/pam.d/password-auth
 
 
 pip install ldapdomaindump impacket mona scapy socket dpkt pcapy requests beautifulsoup paramiko
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Ses1SE_Ovr_vw.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Question1.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Question2.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Ses2_Req.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Question3.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Question4.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec1.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec2.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec3.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec4.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec5.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec6.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec7.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec8.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec9.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec10.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec11.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec12.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n1.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n2.pdf
+http://www.math.uchicago.edu/~may/CONCISE/ConciseRevised.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec01.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec02.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec03.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec04.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec05.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec06.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture1.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture2.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture3.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture4.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture5.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture6.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture7.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture8.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture9.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture10.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture11.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture12.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture13.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture14.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture15.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture16.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture17.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture18.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture19.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture20.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture21.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture22.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture23.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture24.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture25.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture26.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture27.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture28.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture29.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture30.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture31.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture32.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture33.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture34.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture35.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec0.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec1.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec2.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec3.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117notes.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec01.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec02.pdf
+https://ocw.mit.edu/courses/mathematics/18-103-fourier-analysis-fall-2013/readings/MIT18_103F13_intro.pdf
+https://ocw.mit.edu/courses/mathematics/18-103-fourier-analysis-fall-2013/readings/MIT18_103F13_booleanrings.pdf
+https://ocw.mit.edu/courses/mathematics/18-103-fourier-analysis-fall-2013/readings/MIT18_103F13_lptheory.pdf
+https://ocw.mit.edu/courses/mathematics/18-103-fourier-analysis-fall-2013/readings/MIT18_103F13_orthonormal.pdf
+https://ocw.mit.edu/courses/mathematics/18-103-fourier-analysis-fall-2013/readings/MIT18_103F13_fseries1.pdf
+https://ocw.mit.edu/courses/mathematics/18-103-fourier-analysis-fall-2013/readings/MIT18_103F13_fseries2.pdf
+https://ocw.mit.edu/courses/mathematics/18-103-fourier-analysis-fall-2013/readings/MIT18_103F13_fseries3.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am35.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am51.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am52.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am53.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am54.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am55.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am56.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am57.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am61.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am62.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am63.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am64.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture1.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture2.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec1.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec2.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec3.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec4.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec5.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec6.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec7.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec8.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec9.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec10.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec11.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec12.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec13.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec14.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec15.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec16.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec17.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec18.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec19.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec20.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec21.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec22.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec23.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec24.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec25.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec26.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec27.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec28.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec29.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec30.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec31.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec32.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec33.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec34.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec35.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec36.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec37.pdf
+https://ocw.mit.edu/courses/mathematics/18-905-algebraic-topology-i-fall-2016/lecture-notes/MIT18_905F16_lec38.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture3.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture4.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture5.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture6.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture7.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture8.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture9.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture10.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture11.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture12.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture13.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture14.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture15.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture16.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture17.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture18.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture19.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture20.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture21.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture22.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture23.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture24.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture25.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture26.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture27.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture28.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture29.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture30.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture31.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture32.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture33.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture34.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture35.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am65.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am71.pdf
+https://ocw.mit.edu/courses/mathematics/18-086-mathematical-methods-for-engineers-ii-spring-2006/readings/am72.pdf
+https://ocw.mit.edu/courses/mathematics/18-103-fourier-analysis-fall-2013/readings/MIT18_103F13_fourierint1.pdf
+https://ocw.mit.edu/courses/mathematics/18-103-fourier-analysis-fall-2013/readings/MIT18_103F13_fourierint2.pdf
+https://ocw.mit.edu/courses/mathematics/18-103-fourier-analysis-fall-2013/readings/MIT18_103F13_brownian.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec1.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec2.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec3.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec4.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec5.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec6.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec7.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec8.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec9.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec10.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec11.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec12.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec13.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec14.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec15.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec16.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec17.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec18.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec19.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec20.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec21.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec22.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec23.pdf
+https://ocw.mit.edu/courses/mathematics/18-125-measure-and-integration-fall-2003/lecture-notes/18125_lec24.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec03.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec04.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec05.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec06.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec07.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec08.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec09.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec10.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec11.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec12.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec13.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec14.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec15.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec16.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec17.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec18.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec19.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec20.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec21.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec22.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec23.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec24.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec25.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec26.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec27.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec28.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec29.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec30.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec31.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec32.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec33.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec34.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec35.pdf
+https://ocw.mit.edu/courses/mathematics/18-117-topics-in-several-complex-variables-spring-2005/lecture-notes/18117_lec36.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec4.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec5.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec6.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec7.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec8.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec9.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec10.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec11.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da1.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da2.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da3.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da4.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da5.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da6.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da7.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da8.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da9.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da10.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da11.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da12.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da13andlast.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec0.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec1.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec2.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec3.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec4.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec5.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec6.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec7.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec8.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec9.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec10.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/lec11.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da1.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da2.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da3.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da4.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da5.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da6.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da7.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da8.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da9.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da10.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da11.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da12.pdf
+https://ocw.mit.edu/courses/mathematics/18-156-differential-analysis-spring-2004/lecture-notes/da13andlast.pdf
 
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture1.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture2.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture3.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture4.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture5.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture6.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture7.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture8.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture9.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture10.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture11.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture12.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture13.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture14.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture15.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture16.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture17.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture18.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture19.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture20.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture21.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture22.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture23.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture24.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture25.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture26.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture27.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture28.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture29.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture30.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture31.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture32.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture33.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture34.pdf
+https://ocw.mit.edu/courses/mathematics/18-075-advanced-calculus-for-engineers-fall-2004/lecture-notes/lecture35.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec07.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec08.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec09.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec10.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec11.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec12.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec13.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec14.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec15.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec21.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec22.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec29.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec30.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec31.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec32.pdf
+https://ocw.mit.edu/courses/mathematics/18-906-algebraic-topology-ii-spring-2006/lecture-notes/lec33.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec01.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec02.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec03.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec04.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec05.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec06.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec07.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec08.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec09.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec10.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec11.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec12.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec13.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec14.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec15.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec16.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec17.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec18.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec19.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec20.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec21.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec22.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec23.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec24.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_lec25.pdf
+https://ocw.mit.edu/courses/mathematics/18-725-algebraic-geometry-fall-2015/lecture-notes/MIT18_725F15_notes.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n3.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n4.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n5.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n6.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n7.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n8.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n9.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n10.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n11.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n12.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n13.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n14.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n15.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n16.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n17.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n18.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n19.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n20.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n21.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n22.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n23.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n24.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-856j-randomized-algorithms-fall-2002/lecture-notes/n25.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec14.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec15.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec16.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec17.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec18.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec19.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec22.pdf
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec23.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Ses3_sysmodlg.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Question5.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MTI16_842F15_Ses4_Con_Syn.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Ses_5_Design.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Question6.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Ses_6_Des_Def.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Question7.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Ses7Mastr_Sol.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Ses_8_Sys_Int.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Question8.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Ses9_Ver.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Question9.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Ses_10_Com_Opr.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Question10.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_Ses11_Life.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MIT16_842F15_StandardsQ.pdf
+https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-842-fundamentals-of-systems-engineering-fall-2015/lecture-notes/MTI16_842F15_Ses12_FutofSE.pdf
  wget https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2005/lecture-notes/fibheaps.pdf
  wget https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2005/lecture-notes/n0_intro.pdf
  wget https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2005/lecture-notes/n1_fibonacci.pdf
