@@ -43,15 +43,17 @@ done
 for fname in *.pdf; do (mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').pdf; ) done
 
 for fuckit in *.pdf; 
-do 
-    pdftk $fuckit burst
+do
+    catez=${fuckit%.*}
+    catez="$catez-%d.pdf"
+    pdftk $fuckit burst output $catez
     rm  $fuckit 
 done
 for lovewiththecoco in *.pdf; 
 do
-    cat=${lovewiththecoco%.*}
-    cat="$cat.jpg"
-    convert -density 300 -strip $lovewiththecoco  -quality 100 $cat
+    cate=${lovewiththecoco%.*}
+    cate="$cate.jpg"
+    convert -density 300 -strip $lovewiththecoco  -quality 100 $cate
     rm $lovewiththecoco
 done
 echo "process complete"
