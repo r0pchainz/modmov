@@ -1,6 +1,6 @@
 #update and install pdftk ffmpeg
 sudo apt-get update &&
-sudo apt-get install pdftk ffmpeg -y
+sudo apt-get install pdftk ffmpeg imagemagik -y
 
 #convert all filenames to lowercase
 find . -name '*.*' -exec sh -c '
