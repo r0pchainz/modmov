@@ -3,9 +3,7 @@ sudo apt-get update &&
 sudo apt-get install pdftk ffmpeg imagemagik -y
 
 #convert all filenames to lowercase
-find . -name '*.*' -exec sh -c '
-  a=$(echo "$0" | sed -r "s/([^.]*)\$/\L\1/");
-  [ "$a" != "$0" ] && mv "$0" "$a" ' {} \;
+#find . -name '*.*' -exec sh -c '  a=$(echo "$0" | sed -r "s/([^.]*)\$/\L\1/");  [ "$a" != "$0" ] && mv "$0" "$a" ' {} \;
 
 #parse to mp4
 find . -iname "*.mov" -exec bash -c 'mv "$0" "${0%\.mov}.mp4"' {} \;
@@ -31,11 +29,7 @@ find . -iname "*.vtt" -exec bash -c 'mv "$0" "${0%\.vtt}.pdf"' {} \;
 find . -iname "*.azw3" -exec bash -c 'mv "$0" "${0%\.azw3}.pdf"' {} \;
 
 #rename file to sha1
-for fname in *.mp4;
-do 
-(mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').mp4; )
-ffmpeg -i $fname -vcodec libx264 -crf 24 $fname
-done
+#for fname in *.mp4; do ((mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').mp4; ) && ffmpeg -i $fname -vcodec libx264 -crf 24 $fname) done
 
 #rename file to sha1 in case of long name/ bad chars
 for fname in *.pdf; do (mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').pdf; ) done
@@ -47,6 +41,7 @@ do
     pdftk $fuckit burst output $catez
     rm  $fuckit 
 done
+
 for lovewiththecoco in *.pdf; 
 do
     cate=${lovewiththecoco%.*}
