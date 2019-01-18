@@ -33,8 +33,6 @@ find . -iname "*.azw3" -exec bash -c 'mv "$0" "${0%\.azw3}.pdf"' {} \;
 #rename file to sha1
 for fname in *.mp4;
 do 
-cgg=$(pwgen 13)
-cgg="$cgg.mp4"
 (mv "$fname" $(echo "$fname" | sha1sum | cut -f1 -d' ').mp4; )
 ffmpeg -i $fname -vcodec libx264 -crf 24 $fname
 done
